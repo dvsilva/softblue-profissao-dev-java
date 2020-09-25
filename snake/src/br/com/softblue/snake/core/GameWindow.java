@@ -2,6 +2,7 @@ package br.com.softblue.snake.core;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -20,6 +21,10 @@ public class GameWindow extends JFrame implements KeyListener {
 
 	private Image buffer;
 	private Graphics gImage;
+	
+	private Rectangle drawingArea;
+
+	private long lastKeyboardEventType;
 
 	public GameWindow(Snake snake) {
 		this.snake = snake;
@@ -39,6 +44,7 @@ public class GameWindow extends JFrame implements KeyListener {
 		renderer = new Renderer(gImage);
 
 		addKeyListener(this);
+		defineDrawingArea();
 	}
 
 	@Override
@@ -50,12 +56,27 @@ public class GameWindow extends JFrame implements KeyListener {
 		gScreen.drawImage(buffer, 0, 0, null);
 	}
 
+	private void defineDrawingArea() {
+		int realHeight = (int) getContentPane().getSize().getHeight();
+		int upperY = Constants.WINDOW_HEIGHT - realHeight;
+		drawingArea = new Rectangle(0, upperY, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT - upperY);
+	}
+	
+	public Rectangle getDrawingArea() {
+		return drawingArea;
+	}
+
 	public Renderer getRenderer() {
 		return this.renderer;
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		long now = System.currentTimeMillis();
+		
+		if(now - lastKeyboardEventType < 40)
+			return;
+		
 		int keyCode = e.getKeyCode();
 
 		if (keyCode == KeyEvent.VK_UP) {
@@ -69,6 +90,8 @@ public class GameWindow extends JFrame implements KeyListener {
 		} else if (keyCode == KeyEvent.VK_ESCAPE) {
 			System.exit(0);
 		}
+		
+		lastKeyboardEventType = now;
 	}
 
 	@Override

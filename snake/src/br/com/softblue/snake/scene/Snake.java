@@ -12,6 +12,7 @@ import br.com.softblue.snake.util.GameUtils;
 public class Snake extends Shape {
 
 	private Direction direction;
+	private int piecesToElongate;
 
 	public Snake() {
 		super(Constants.SNAKE_COLOR);
@@ -35,7 +36,7 @@ public class Snake extends Shape {
 	public void move() {
 		if(direction != Direction.NONE) {
 			Rect head = getFirstRect();
-			// Rect tails = getLastRect();
+			Rect tail = getLastRect();
 			
 			// muda posição dos rects atual passa a ser o anterior
 			// deslocar para o lado
@@ -44,6 +45,11 @@ public class Snake extends Shape {
 			// dulica a cabeça e coloca na frente
 			Rect newHead = duplicateRect(head, direction);
 			getRects().set(0, newHead);
+			
+			if (piecesToElongate > 0) {
+				getRects().add(tail);
+				piecesToElongate--;
+			}
 		}
 	}
 	
@@ -65,6 +71,10 @@ public class Snake extends Shape {
 	public synchronized void down() {
 		if(direction.canChangeTo(Direction.DOWN))
 			direction = Direction.DOWN;
+	}
+	
+	public void elongate() {
+		piecesToElongate = Constants.SNAKE_ELONGATE_PIECES;
 	}
 
 	public boolean collidesWithItSelf() {
